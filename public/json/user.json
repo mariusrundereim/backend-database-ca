@@ -1,0 +1,4 @@
+{
+  "id": 1,
+  "query": "INSERT INTO Users (fullName, username, password, role) VALUES ('System Admin', 'Admin', 'admin1234', 'admin'), ('User', 'User', 'user1234', 'member'), ('User2', 'User2', 'User1234', 'member');"
+}
