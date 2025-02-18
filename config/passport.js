@@ -1,6 +1,7 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const { User } = require("../models");
+const db = require("../models");
+const User = db.User;
 
 module.exports = function (passport) {
   passport.use(
@@ -12,8 +13,8 @@ module.exports = function (passport) {
           return done(null, false, { message: "Incorrect username." });
         }
 
-        // In a production environment, you should use proper password hashing
         if (password !== user.password) {
+          // In production, use proper password hashing
           return done(null, false, { message: "Incorrect password." });
         }
 
