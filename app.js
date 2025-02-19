@@ -6,7 +6,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var session = require("express-session");
-const SQLiteStore = require("connect-sqlite3")(session);
+const MySQLStore = require("express-mysql-session")(session);
 const passport = require("passport");
 const initializeDatabase = require("./utils/initDb");
 const fs = require("fs");
@@ -38,21 +38,22 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Single session configuration
-const sessionConfig = {
-  store: new SQLiteStore({
-    db: "sessions.db",
-    dir: sessionsDir,
-    mode: 0o755,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
-  },
-};
+const sessionStore = new MySQLStore({
+  host: process.env.HOST,
+  port: 3306,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DATABASE_NAME,
+});
 
-app.use(session(sessionConfig));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 // Initialize Passport and load config
 require("./config/passport")(passport);
