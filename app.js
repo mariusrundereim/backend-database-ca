@@ -1,3 +1,4 @@
+// app.js
 require("dotenv").config();
 var createError = require("http-errors");
 var express = require("express");
@@ -7,6 +8,8 @@ var logger = require("morgan");
 var session = require("express-session");
 const SQLiteStore = require("connect-sqlite3")(session);
 const passport = require("passport");
+const initializeDatabase = require("./utils/initDb");
+const fs = require("fs");
 
 // Import routes
 var indexRouter = require("./routes/index");
@@ -16,6 +19,12 @@ var temperamentRouter = require("./routes/temperament");
 const { router: authRouter } = require("./routes/auth");
 
 var app = express();
+
+// Create sessions directory if it doesn't exist
+const sessionsDir = path.join(__dirname, "sessions");
+if (!fs.existsSync(sessionsDir)) {
+  fs.mkdirSync(sessionsDir, { recursive: true, mode: 0o755 });
+}
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -28,20 +37,25 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Session configuration (after other middleware, before routes)
-app.use(
-  session({
-    store: new SQLiteStore(),
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    },
-  })
-);
+// Single session configuration
+const sessionConfig = {
+  store: new SQLiteStore({
+    db: "sessions.db",
+    dir: sessionsDir,
+    mode: 0o755,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+  },
+};
 
-// Initialize Passport and restore authentication state from session
+app.use(session(sessionConfig));
+
+// Initialize Passport and load config
+require("./config/passport")(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -51,12 +65,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Routes - simplify auth routes
 app.use("/", indexRouter);
 app.use("/animals", animalsRouter);
 app.use("/species", speciesRouter);
 app.use("/temperament", temperamentRouter);
-app.use("/auth", authRouter);
+app.use("/", authRouter); // This will handle auth routes including /login
+
+// Initialize database
+initializeDatabase().catch(console.error);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

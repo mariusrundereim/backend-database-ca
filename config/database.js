@@ -6,7 +6,14 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     database: process.env.DATABASE_NAME,
     host: process.env.HOST,
-    dialect: process.env.DIALECT,
-    dialectModule: require(process.env.DIALECTMODEL),
+    dialect: "mysql",
+    dialectModule: require("mysql2"),
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
+    logging: console.log, // For debugging
   },
 };

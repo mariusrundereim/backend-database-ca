@@ -1,23 +1,14 @@
-const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const db = require("../models");
-const User = db.User;
+const AuthService = require("../services/authService");
 
 module.exports = function (passport) {
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy(async function (username, password, done) {
       try {
-        const user = await User.findOne({ where: { username: username } });
-
+        const user = await AuthService.verifyUser(username, password);
         if (!user) {
-          return done(null, false, { message: "Incorrect username." });
+          return done(null, false, { message: "Invalid credentials" });
         }
-
-        if (password !== user.password) {
-          // In production, use proper password hashing
-          return done(null, false, { message: "Incorrect password." });
-        }
-
         return done(null, user);
       } catch (err) {
         return done(err);
@@ -25,16 +16,20 @@ module.exports = function (passport) {
     })
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
+  // Serialize user based on the image example
+  passport.serializeUser(function (user, cb) {
+    process.nextTick(function () {
+      cb(null, {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      });
+    });
   });
 
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await User.findByPk(id);
-      done(null, user);
-    } catch (err) {
-      done(err);
-    }
+  passport.deserializeUser(function (user, cb) {
+    process.nextTick(function () {
+      return cb(null, user);
+    });
   });
 };
