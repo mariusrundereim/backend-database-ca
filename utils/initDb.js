@@ -1,4 +1,33 @@
 const db = require("../models");
+const fs = require("fs").promises;
+const path = require("path");
+
+async function initializeDatabase() {
+  try {
+    // Only sync database structure - this creates the tables
+    await db.sequelize.sync();
+    console.log("Database tables created successfully");
+
+    // Create sessions directory if needed
+    const sessionsDir = path.join(__dirname, "../sessions");
+    try {
+      await fs.access(sessionsDir);
+    } catch {
+      await fs.mkdir(sessionsDir);
+      console.log("Sessions directory created");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Database initialization error:", error);
+    throw error;
+  }
+}
+
+module.exports = initializeDatabase;
+
+/*
+const db = require("../models");
 const AuthService = require("../services/authService");
 const fs = require("fs").promises;
 const path = require("path");
@@ -79,3 +108,5 @@ async function initializeDatabase() {
 }
 
 module.exports = initializeDatabase;
+
+*/

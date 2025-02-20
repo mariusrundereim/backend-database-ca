@@ -16,6 +16,7 @@ var indexRouter = require("./routes/index");
 var animalsRouter = require("./routes/animals");
 var speciesRouter = require("./routes/species");
 var temperamentRouter = require("./routes/temperament");
+const databaseRoutes = require("./routes/database");
 const { router: authRouter } = require("./routes/auth");
 
 var app = express();
@@ -71,7 +72,8 @@ app.use("/", indexRouter);
 app.use("/animals", animalsRouter);
 app.use("/species", speciesRouter);
 app.use("/temperament", temperamentRouter);
-app.use("/", authRouter); // This will handle auth routes including /login
+app.use("/", authRouter);
+app.use("/api", databaseRoutes);
 
 // Initialize database
 initializeDatabase().catch(console.error);
