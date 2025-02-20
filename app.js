@@ -1,4 +1,3 @@
-// app.js
 require("dotenv").config();
 var createError = require("http-errors");
 var express = require("express");
@@ -6,10 +5,12 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var session = require("express-session");
+const flash = require("connect-flash");
 const MySQLStore = require("express-mysql-session")(session);
 const passport = require("passport");
 const initializeDatabase = require("./utils/initDb");
 const fs = require("fs");
+const verifyJsonFiles = require("./utils/verifyJsonFiles");
 
 // Import routes
 var indexRouter = require("./routes/index");
@@ -56,6 +57,9 @@ app.use(
   })
 );
 
+// Flash messages
+app.use(flash());
+
 // Initialize Passport and load config
 require("./config/passport")(passport);
 app.use(passport.initialize());
@@ -64,6 +68,7 @@ app.use(passport.session());
 // Make user object available in all views
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
+  res.locals.messages = req.flash();
   next();
 });
 
@@ -77,6 +82,11 @@ app.use("/api", databaseRoutes);
 
 // Initialize database
 initializeDatabase().catch(console.error);
+
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -93,5 +103,12 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
+if (process.env.NODE_ENV === "development") {
+  const checkDatabase = require("./utils/checkDatabase");
+  const verifyJsonFiles = require("./utils/verifyJsonFiles");
+
+  Promise.all([verifyJsonFiles(), checkDatabase()]).catch(console.error);
+}
 
 module.exports = app;

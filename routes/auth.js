@@ -31,14 +31,30 @@ router.post("/signup", async (req, res) => {
     };
 
     await AuthService.createUser(userData);
+    req.flash("success", "Account created successfully. Please log in.");
     res.redirect("/login");
   } catch (error) {
     console.error("Error in signup:", error);
-    res.status(500).json({ message: "Error creating user" });
+    req.flash("error", "Error creating account");
+    res.redirect("/signup");
   }
 });
 
 // Login route
+router.post(
+  "/login/password",
+  (req, res, next) => {
+    console.log("Login attempt:", req.body);
+    next();
+  },
+  passport.authenticate("local", {
+    successRedirect: "/animals",
+    failureRedirect: "/login",
+    failureFlash: true,
+  })
+);
+
+/*
 router.post(
   "/login/password",
   passport.authenticate("local", {
@@ -56,6 +72,7 @@ router.post(
     }
   }
 );
+*/
 
 // Logout route - Changed to POST to match the form
 router.post("/logout", (req, res) => {
@@ -106,6 +123,26 @@ const isAdmin = (req, res, next) => {
   }
   res.status(403).send("Access denied");
 };
+
+// routes/auth.js - Add this route for debugging
+router.get("/check-users", async (req, res) => {
+  try {
+    const users = await db.User.findAll({
+      attributes: ["username", "role", "createdAt"],
+    });
+
+    res.json({
+      count: users.length,
+      users: users.map((u) => ({
+        username: u.username,
+        role: u.role,
+        created: u.createdAt,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = {
   router,

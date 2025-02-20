@@ -7,7 +7,16 @@ const db = require("../models");
 class PopulationService {
   static async populateDatabase() {
     try {
-      // Populate in correct order due to foreign key constraints
+      // Order matters due to foreign key relationships:
+      // 1. Species (no dependencies)
+      // 2. Temperaments (no dependencies)
+      // 3. Users (no dependencies)
+      // 4. Animals (depends on Species)
+      // 5. Animal_Temperaments (depends on Animals and Temperaments)
+      // 6. Adoptions (depends on Users and Animals)
+
+      console.log("Starting database population in order...");
+
       await SpeciesService.populateSpecies();
       await TemperamentService.populateTemperaments();
       await UserService.populateUsers();
