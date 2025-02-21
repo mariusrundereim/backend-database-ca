@@ -6,9 +6,21 @@ const { isAuthenticated, isAdmin, isMember } = require("../middlewares/auth");
 
 // Helper function to calculate age
 const calculateAge = (birthday) => {
-  const ageDifMs = Date.now() - new Date(birthday).getTime();
-  const ageDate = new Date(ageDifMs);
-  return Math.abs(ageDate.getUTCFullYear() - 1970);
+  const birthDate = new Date(birthday);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  // Adjust age if birthday hasn't occurred this year
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
 };
 
 // Get all animals
@@ -103,18 +115,29 @@ router.post("/adopt/:id", isMember, async (req, res) => {
 // Cancel adoption - requires admin role
 router.post("/cancel-adoption/:id", isAdmin, async (req, res) => {
   try {
-    const adoption = await Adoption.findOne({
-      where: { animalId: req.params.id },
+    // First check if the animal exists and if it's adopted
+    const animal = await Animal.findByPk(req.params.id, {
+      include: [
+        {
+          model: Adoption,
+          as: "adoption",
+        },
+      ],
     });
 
-    if (!adoption) {
-      return res.status(404).send("Adoption record not found");
+    if (!animal) {
+      return res.status(404).send("Animal not found");
     }
 
-    await adoption.destroy();
+    if (!animal.adoption) {
+      return res.status(400).send("This animal is not currently adopted");
+    }
+
+    // Now we can safely delete the adoption record
+    await animal.adoption.destroy();
     res.status(200).send("Adoption cancelled successfully");
   } catch (error) {
-    console.error("Error in cancel-adoption route:", error);
+    console.error("Error in cancel-adoption route:", error, error.stack);
     res.status(500).send(error.message);
   }
 });

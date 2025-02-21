@@ -38,6 +38,7 @@ async function deleteAnimal(id) {
   }
 }
 
+// Popular names
 async function sqlQuery1() {
   try {
     const response = await fetch("/animals/popular-names");
@@ -48,6 +49,7 @@ async function sqlQuery1() {
   }
 }
 
+// Adoption details
 async function sqlQuery2() {
   try {
     const response = await fetch("/animals/adoption-details");
@@ -58,6 +60,8 @@ async function sqlQuery2() {
   }
 }
 
+// Animal by age
+
 async function sqlQuery3() {
   try {
     const response = await fetch("/animals/by-age");
@@ -67,6 +71,8 @@ async function sqlQuery3() {
     alert("Error fetching animals by age");
   }
 }
+
+// Animals in date range
 
 async function sqlQuery4() {
   const startDate = prompt("Enter start date (YYYY-MM-DD):");
@@ -85,6 +91,8 @@ async function sqlQuery4() {
   }
 }
 
+// Animals by size
+
 async function sqlQuery5() {
   try {
     const response = await fetch("/animals/by-size");
@@ -94,6 +102,8 @@ async function sqlQuery5() {
     alert("Error fetching animals by size");
   }
 }
+
+// All animals
 
 async function allAnimals() {
   location.reload();

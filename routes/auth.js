@@ -54,26 +54,6 @@ router.post(
   })
 );
 
-/*
-router.post(
-  "/login/password",
-  passport.authenticate("local", {
-    successRedirect: "/animals",
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  async (req, res) => {
-    if (req.user && req.user.role === "admin") {
-      console.log(
-        `Admin user ${
-          req.user.username
-        } accessed the application at ${new Date()}`
-      );
-    }
-  }
-);
-*/
-
 // Logout route - Changed to POST to match the form
 router.post("/logout", (req, res) => {
   req.logout((err) => {
@@ -114,7 +94,7 @@ const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("/login"); // Changed from /signin to /login to match your routes
+  res.redirect("/login");
 };
 
 const isAdmin = (req, res, next) => {
@@ -124,7 +104,6 @@ const isAdmin = (req, res, next) => {
   res.status(403).send("Access denied");
 };
 
-// routes/auth.js - Add this route for debugging
 router.get("/check-users", async (req, res) => {
   try {
     const users = await db.User.findAll({
