@@ -1,19 +1,20 @@
 const express = require("express");
-const router = express.Router();
 const { instance: speciesService } = require("../services/speciesService");
 const { isAdmin } = require("../middlewares/auth");
+const router = express.Router();
 
 // GET all species (accessible by all)
 router.get("/", async function (req, res, next) {
   try {
+    console.log("Fetching all species...");
     const species = await speciesService.getAllSpecies();
+    console.log("Found species:", species);
     res.render("species", {
       user: req.user,
       species: species,
-      error: req.flash("error"),
-      success: req.flash("success"),
     });
   } catch (error) {
+    console.error("Error in species route:", error);
     next(error);
   }
 });
@@ -31,7 +32,7 @@ router.post("/add", isAdmin, async function (req, res, next) {
     req.flash("success", "Species added successfully");
     res.redirect("/species");
   } catch (error) {
-    req.flash("error", error.message);
+    next(error);
     res.redirect("/species");
   }
 });
@@ -51,7 +52,7 @@ router.post("/update/:id", isAdmin, async function (req, res, next) {
     req.flash("success", "Species updated successfully");
     res.redirect("/species");
   } catch (error) {
-    req.flash("error", error.message);
+    next(error);
     res.redirect("/species");
   }
 });
@@ -64,7 +65,7 @@ router.post("/delete/:id", isAdmin, async function (req, res, next) {
     req.flash("success", "Species deleted successfully");
     res.redirect("/species");
   } catch (error) {
-    req.flash("error", error.message);
+    next(error);
     res.redirect("/species");
   }
 });

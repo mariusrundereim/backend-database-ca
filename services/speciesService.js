@@ -1,51 +1,52 @@
-const Species = require("../models/species");
-const Animal = require("../models/animal");
 const DatabaseService = require("./databaseService");
+const db = require("../models");
 
 class SpeciesService {
-  // Static method for populating species
+  // Static method for population
   static async populateSpecies() {
     try {
-      const speciesQueries = await DatabaseService.readJsonFile("species.json");
+      console.log("Starting species population...");
+      const existingSpecies = await db.Species.findAll();
+      console.log(
+        "Current species:",
+        existingSpecies.map((s) => s.name)
+      );
 
-      // If it's an object with numbered keys, convert to array
-      const queriesArray = Array.isArray(speciesQueries)
-        ? speciesQueries
-        : Object.values(speciesQueries);
+      const data = await DatabaseService.readJsonFile("species.json");
+      console.log("Species population query:", data.query);
+      await DatabaseService.executeQuery(data.query, {
+        type: db.Sequelize.QueryTypes.INSERT,
+      });
 
-      // Debug log to see what we're working with
-      console.log("Queries to execute:", queriesArray);
-
-      for (const queryData of queriesArray) {
-        if (queryData && queryData.query) {
-          await Species.sequelize.query(queryData.query);
-        } else {
-          console.warn("Invalid query data:", queryData);
-        }
-      }
-
-      console.log("Species data populated successfully");
+      const speciesAfter = await db.Species.findAll();
+      console.log("Species after population:", speciesAfter);
+      return true;
     } catch (error) {
-      console.error("Error populating species:", error);
+      console.error("Detailed error in populateSpecies:", error);
       throw error;
     }
   }
 
-  // Instance methods for CRUD operations
+  // Instance methods
   async getAllSpecies() {
-    return await Species.findAll({
-      order: [["name", "ASC"]],
-    });
+    try {
+      return await db.Species.findAll({
+        order: [["name", "ASC"]],
+      });
+    } catch (error) {
+      console.error("Error getting all species:", error);
+      throw error;
+    }
   }
 
   async addSpecies(name) {
-    return await Species.create({
+    return await db.Species.create({
       name: name,
     });
   }
 
   async updateSpecies(id, name) {
-    const species = await Species.findByPk(id);
+    const species = await db.Species.findByPk(id);
     if (!species) {
       throw new Error("Species not found");
     }
@@ -53,16 +54,15 @@ class SpeciesService {
   }
 
   async deleteSpecies(id) {
-    // Check if species is being used by any animals
-    const animalsWithSpecies = await Animal.findOne({
-      where: { species_id: id },
+    const animalsWithSpecies = await db.Animal.findOne({
+      where: { speciesId: id },
     });
 
     if (animalsWithSpecies) {
       throw new Error("Cannot delete species that has dependent animals");
     }
 
-    const species = await Species.findByPk(id);
+    const species = await db.Species.findByPk(id);
     if (!species) {
       throw new Error("Species not found");
     }
@@ -71,8 +71,12 @@ class SpeciesService {
   }
 }
 
+// Create and export instance for routes to use
+const speciesService = new SpeciesService();
+
+// Export both the class (for static methods) and instance (for instance methods)
 module.exports = SpeciesService;
-module.exports.instance = new SpeciesService();
+module.exports.instance = speciesService;
 
 /*
 const DatabaseService = require("./databaseService");
