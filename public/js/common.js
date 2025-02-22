@@ -1,3 +1,43 @@
+async function adoptAnimal(id) {
+  try {
+    const response = await fetch(`/animals/adopt/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    alert("Animal adopted successfully!");
+    location.reload();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function deleteAnimal(id) {
+  try {
+    const response = await fetch(`/animals/cancel-adoption/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    alert("Adoption cancelled successfully!");
+    location.reload();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
 // Popular names
 async function sqlQuery1() {
   try {
