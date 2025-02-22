@@ -242,63 +242,28 @@ const formatAnimalData = (animal) => {
 // SQL Query 1: Popular Animal Names
 router.get("/popular-names", async (req, res) => {
   try {
-    const popularNames = await Animal.findAll({
-      include: [
-        {
-          model: Species,
-          as: "species",
-          attributes: ["name"],
-        },
-        {
-          model: Temperament,
-          as: "temperaments",
-          attributes: ["name"],
-          through: { attributes: [] },
-        },
-        {
-          model: Adoption,
-          as: "adoption",
-        },
-      ],
-      attributes: {
-        include: [
-          [Sequelize.fn("COUNT", Sequelize.col("Animal.name")), "popularity"],
-        ],
-      },
-      group: [
-        "Animal.id",
-        "Animal.name",
-        "Animal.birthday",
-        "Animal.size",
-        "Animal.speciesId",
-        "species.id",
-        "species.name",
-      ],
-      order: [[Sequelize.fn("COUNT", Sequelize.col("Animal.name")), "DESC"]],
-    });
+    // Simple query to count name occurrences
+    const [results] = await sequelize.query(
+      `
+      SELECT 
+        name,
+        COUNT(*) as occurrence_count
+      FROM Animals
+      GROUP BY name
+      ORDER BY occurrence_count DESC
+      `,
+      {
+        type: Sequelize.QueryTypes.SELECT,
+      }
+    );
 
-    // Format the data to match the EJS template structure
-    const formattedAnimals = popularNames.map((animal) => {
-      const plainAnimal = animal.get({ plain: true });
-      const age = calculateAge(plainAnimal.birthday);
-      return {
-        Id: plainAnimal.id,
-        Name: plainAnimal.name,
-        Species: plainAnimal.species?.name || "",
-        Birthday: plainAnimal.birthday,
-        Temperament:
-          plainAnimal.temperaments?.map((t) => t.name).join(", ") || "",
-        Size: plainAnimal.size,
-        Age: `${plainAnimal.popularity} occurrences`, // Show count in Age column
-        Adopted: plainAnimal.adoption ? true : false,
-      };
-    });
+    // Format the results for the frontend table
+    const formattedResults = results.map((result) => ({
+      Name: result.name,
+      Occurrences: result.occurrence_count,
+    }));
 
-    // Render the same EJS template with the filtered data
-    res.render("animals", {
-      user: req.user || null,
-      animals: formattedAnimals,
-    });
+    res.json(formattedResults);
   } catch (error) {
     console.error("Error in popular-names route:", error);
     res.status(500).send(error.message);

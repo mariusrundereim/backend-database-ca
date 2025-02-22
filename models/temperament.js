@@ -3,10 +3,10 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Temperament extends Model {
     static associate(models) {
-      // Define associations with Animal (many-to-many)
       Temperament.belongsToMany(models.Animal, {
         through: "AnimalTemperaments",
         foreignKey: "temperamentId",
+        otherKey: "animalId", // explicitly define the other key
         as: "animals",
       });
     }
@@ -23,11 +23,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        field: "temperamentName", // explicitly name the database column
       },
     },
     {
       sequelize,
       modelName: "Temperament",
+      tableName: "Temperaments",
       timestamps: true,
     }
   );

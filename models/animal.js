@@ -1,5 +1,4 @@
 const { Model } = require("sequelize");
-
 module.exports = (sequelize, DataTypes) => {
   class Animal extends Model {
     static associate(models) {
@@ -12,16 +11,17 @@ module.exports = (sequelize, DataTypes) => {
       Animal.belongsTo(models.Species, {
         foreignKey: "speciesId",
         as: "species",
+        targetKey: "id",
       });
       // Define associations with Temperament (many-to-many)
       Animal.belongsToMany(models.Temperament, {
         through: "AnimalTemperaments",
         foreignKey: "animalId",
+        otherKey: "temperamentId",
         as: "temperaments",
       });
     }
   }
-
   Animal.init(
     {
       id: {
@@ -44,14 +44,18 @@ module.exports = (sequelize, DataTypes) => {
       speciesId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "Species",
+          key: "id",
+        },
       },
     },
     {
       sequelize,
       modelName: "Animal",
+      tableName: "Animals",
       timestamps: true,
     }
   );
-
   return Animal;
 };

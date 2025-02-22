@@ -1,3 +1,3 @@
 {
-  "query": "INSERT INTO Species (name, createdAt, updatedAt) VALUES ('Dwarf Hamster', NOW(), NOW()), ('Teddy bear hamster', NOW(), NOW()), ('Jack-Russel', NOW(), NOW()) ON DUPLICATE KEY UPDATE updatedAt = VALUES(updatedAt);"
+  "query": "INSERT INTO Species (speciesName, createdAt, updatedAt) VALUES ('Dwarf Hamster', NOW(), NOW()), ('Teddy bear hamster', NOW(), NOW()), ('Jack-Russel', NOW(), NOW()) ON DUPLICATE KEY UPDATE updatedAt = VALUES(updatedAt);"
 }

@@ -3,10 +3,10 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Species extends Model {
     static associate(models) {
-      // Define association with Animal
       Species.hasMany(models.Animal, {
         foreignKey: "speciesId",
         as: "animals",
+        sourceKey: "id", // explicitly define the source key
       });
     }
   }
@@ -22,11 +22,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        field: "speciesName", // Match
       },
     },
     {
       sequelize,
       modelName: "Species",
+      tableName: "Species", // explicitly define table name
       timestamps: true,
     }
   );
