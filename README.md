@@ -31,7 +31,7 @@ If you are unsure of any instructions for the course assignment, contact out to 
 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/noroff-backend-1/aug24ft-dab-ca-1-mariusrundereim.git)
 cd databaseproject
 ```
 

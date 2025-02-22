@@ -1,3 +1,3 @@
 {
-  "query": "INSERT INTO Species (id, name, createdAt, updatedAt) VALUES (1, 'Dwarf Hamster', NOW(), NOW()), (2, 'Teddy bear hamster', NOW(), NOW()), (3, 'Jack-Russel', NOW(), NOW());"
+  "query": "INSERT INTO Species (name, createdAt, updatedAt) VALUES ('Dwarf Hamster', NOW(), NOW()), ('Teddy bear hamster', NOW(), NOW()), ('Jack-Russel', NOW(), NOW()), ('Budgy', NOW(), NOW()), ('Tortoise', NOW(), NOW()), ('Gold Fish', NOW(), NOW()), ('Lizzard', NOW(), NOW()), ('Bearded Dragon', NOW(), NOW()), ('Parrot', NOW(), NOW()), ('Corn snake', NOW(), NOW());"
 }
