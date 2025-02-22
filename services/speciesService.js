@@ -74,28 +74,6 @@ class SpeciesService {
 // Create and export instance for routes to use
 const speciesService = new SpeciesService();
 
-// Export both the class (for static methods) and instance (for instance methods)
+// Export static and instance methods
 module.exports = SpeciesService;
 module.exports.instance = speciesService;
-
-/*
-const DatabaseService = require("./databaseService");
-const db = require("../models");
-
-class SpeciesService {
-  static async populateSpecies() {
-    try {
-      const data = await DatabaseService.readJsonFile("species.json");
-      await DatabaseService.executeQuery(data.query);
-      console.log("Species data populated successfully");
-    } catch (error) {
-      console.error("Error populating species:", error);
-      throw error;
-    }
-  }
-}
-
-module.exports = SpeciesService;
-
-
-*/
