@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       Species.hasMany(models.Animal, {
         foreignKey: "speciesId",
         as: "animals",
-        sourceKey: "id", // explicitly define the source key
+        sourceKey: "id",
       });
     }
   }
@@ -17,18 +17,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        field: "speciesName", // Match
       },
     },
     {
       sequelize,
       modelName: "Species",
-      tableName: "Species", // explicitly define table name
+      tableName: "Species",
       timestamps: true,
     }
   );

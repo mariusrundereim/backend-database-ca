@@ -242,7 +242,6 @@ const formatAnimalData = (animal) => {
 // SQL Query 1: Popular Animal Names
 router.get("/popular-names", async (req, res) => {
   try {
-    // Simple query to count name occurrences
     const [results] = await sequelize.query(
       `
       SELECT 
@@ -257,7 +256,6 @@ router.get("/popular-names", async (req, res) => {
       }
     );
 
-    // Format the results for the frontend table
     const formattedResults = results.map((result) => ({
       Name: result.name,
       Occurrences: result.occurrence_count,

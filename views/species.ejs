@@ -1,49 +1,137 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <title> DAB - Adopt Animal</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/stylesheets/styles.css">
-  <script src="../js/common.js"></script>
-</head>
-
-<body>
-  <%- include('./partials/navbar.ejs', {user: user}) %>
+  <head>
+    <title>DAB - Species Management</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/stylesheets/styles.css" />
+    <script src="../js/common.js"></script>
+  </head>
+  <body>
+    <%- include('./partials/navbar.ejs', {user: user}) %>
     <div class="container-fluid mt-5">
-      <h2 class="p-3 text-center">Animals for Adoption - species</h2>
-        <div class="list-group">
-          <div class="row px-3 py-1 w-100">
-            <span class="col py-1 bg-noroff">Id</span>
-            <span class="col py-1 bg-noroff">Name</span>
-            <span class="col py-1 bg-noroff">Options</span>
+      <h2 class="p-3 text-center">Species Management</h2>
+
+      <!-- Flash Messages -->
+      <% if (error && error.length > 0) { %>
+      <div class="alert alert-danger" role="alert"><%= error %></div>
+      <% } %> <% if (success && success.length > 0) { %>
+      <div class="alert alert-success" role="alert"><%= success %></div>
+      <% } %>
+
+      <!-- Add New Species Form -->
+      <% if (user && user.role === 'admin') { %>
+      <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Add New Species</h5>
+              <form action="/species/add" method="POST">
+                <div class="mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="name"
+                    placeholder="Species Name"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-success">
+                  Add Species
+                </button>
+              </form>
+            </div>
           </div>
-          <% species.forEach(function(species) { %>
-            <div class="row px-3 py-1 w-100">
-              <span class="col py-1 bg-light">
-                <%=species.Id%>
-              </span>
-              <span class="col py-1 bg-light">
-                <%=species.Name%>
-              </span>
-              <span class="col py-1 bg-light text-center">
-                <button class="btn-sm btn-warning" onclick="updateSpecies( <%=species.Id%>)">Update species</button>
-                <button class="btn-sm btn-danger" onclick="deleteSpecies( <%=species.Id%>)">Delete species</button>
-              </span>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Species List -->
+      <div class="list-group">
+        <div class="row px-3 py-1 w-100">
+          <span class="col-2 py-1 bg-noroff">Id</span>
+          <span class="col-6 py-1 bg-noroff">Name</span>
+          <% if (user && user.role === 'admin') { %>
+          <span class="col-4 py-1 bg-noroff">Actions</span>
+          <% } %>
+        </div>
+
+        <% species.forEach(function(species) { %>
+        <div class="row px-3 py-1 w-100">
+          <span class="col-2 py-1 bg-light"><%= species.id %></span>
+          <span class="col-6 py-1 bg-light" id="species-name-<%= species.id %>"
+            ><%= species.name %></span
+          >
+          <% if (user && user.role === 'admin') { %>
+          <span class="col-4 py-1 bg-light">
+            <button
+              class="btn btn-sm btn-warning"
+              onclick="showUpdateForm(`<%= species.id %>`)"
+            >
+              Update
+            </button>
+            <form
+              action="/species/delete/`<%= species.id %>`"
+              method="POST"
+              class="d-inline"
+            >
+              <button
+                type="submit"
+                class="btn btn-sm btn-danger"
+                onclick="return confirm('Are you sure you want to delete this species?')"
+              >
+                Delete
+              </button>
+            </form>
+          </span>
+          <% } %>
+        </div>
+
+        <% if (user && user.role === 'admin') { %>
+        <!-- Hidden Update Form -->
+        <div
+          id="update-form-<%= species.id %>"
+          class="row px-3 py-1 w-100"
+          style="display: none"
+        >
+          <form
+            action="/species/update/<%= species.id %>"
+            method="POST"
+            class="col-12"
+          >
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                value="<%= species.name %>"
+                required
+              />
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="hideUpdateForm(`<%= species.id %>`)"
+              >
+                Cancel
+              </button>
             </div>
-            <% }); %>
-              <hr>
-            <div class="row">
-              <div class="col-4"></div>
-              <div class="col-4 text-center mt-2">
-                <form action="/species/add" method="POST">
-                  <button class="btn btn-success" id="btn-add-animal">Add New Species</button>
-                </form>
-              </div>
-              <div class="col-4"></div>
-            </div>
+          </form>
+        </div>
+        <% } %> <% }); %>
       </div>
     </div>
-</body>
 
+    <script>
+      function showUpdateForm(id) {
+        document.getElementById(`update-form-${id}`).style.display = "block";
+      }
+
+      function hideUpdateForm(id) {
+        document.getElementById(`update-form-${id}`).style.display = "none";
+      }
+    </script>
+  </body>
 </html>

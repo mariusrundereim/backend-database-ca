@@ -1,3 +1,3 @@
 {
-  "query": "INSERT INTO Animals (name, speciesId, birthday, size, createdAt, updatedAt) VALUES ('Coco', (SELECT id FROM Species WHERE speciesName = 'Dwarf Hamster'), '2020-02-12', 'Small', NOW(), NOW()), ('Ted', (SELECT id FROM Species WHERE speciesName = 'Teddy bear hamster'), '2021-02-12', 'Small', NOW(), NOW()), ('Coco', (SELECT id FROM Species WHERE speciesName = 'Jack-Russel'), '2020-02-12', 'Medium', NOW(), NOW()) ON DUPLICATE KEY UPDATE updatedAt = VALUES(updatedAt);"
+  "query": "INSERT INTO Animals (name, speciesId, birthday, size, createdAt, updatedAt) SELECT 'Coco', s1.id, '2020-02-12', 'Small', NOW(), NOW() FROM Species s1 WHERE s1.name = 'Dwarf Hamster' UNION ALL SELECT 'Ted', s2.id, '2021-02-12', 'Small', NOW(), NOW() FROM Species s2 WHERE s2.name = 'Teddy bear hamster' UNION ALL SELECT 'Coco', s3.id, '2020-02-12', 'Medium', NOW(), NOW() FROM Species s3 WHERE s3.name = 'Jack-Russel';"
 }
