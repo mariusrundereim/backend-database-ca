@@ -3,6 +3,7 @@ const router = express.Router();
 const { Sequelize, Op } = require("sequelize");
 const { Animal, User, Adoption, Species, Temperament } = require("../models");
 const { isAuthenticated, isAdmin, isMember } = require("../middlewares/auth");
+const { formatDate } = require("../utils/dateFormatter");
 
 // Helper function to calculate age
 const calculateAge = (birthday) => {
@@ -139,7 +140,7 @@ router.get("/", async (req, res) => {
         Id: plainAnimal.id,
         Name: plainAnimal.name,
         Species: plainAnimal.species?.name || "",
-        Birthday: plainAnimal.birthday,
+        Birthday: formatDate(plainAnimal.birthday),
         Temperament:
           plainAnimal.temperaments?.map((t) => t.name).join(", ") || "",
         Size: plainAnimal.size,
@@ -229,7 +230,7 @@ const formatAnimalData = (animal) => {
     Id: animalData.id,
     Name: animalData.name,
     Species: animalData.species ? animalData.species.name : "",
-    Birthday: animalData.birthday,
+    Birthday: formatDate(animalData.birthday),
     Temperament: animalData.temperaments
       ? animalData.temperaments.map((t) => t.name).join(", ")
       : "",
@@ -429,7 +430,7 @@ router.get("/in-date-range", async (req, res) => {
         Id: animalData.id,
         Name: animalData.name,
         Species: animalData.species ? animalData.species.name : "",
-        Birthday: new Date(animalData.birthday).toLocaleDateString(),
+        Birthday: formatDate(plainAnimal.birthday),
         Temperament: animalData.temperaments
           ? animalData.temperaments.map((t) => t.name).join(", ")
           : "",
