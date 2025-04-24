@@ -7,7 +7,7 @@ Adoption
 1. Clone the repository
 
 ```bash
-git clone (https://github.com/mariusrundereim/backend-database-ca.git)
+git clone https://github.com/mariusrundereim/backend-database-ca.git
 cd databaseproject
 ```
 
