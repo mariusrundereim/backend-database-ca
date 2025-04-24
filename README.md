@@ -1,71 +1,143 @@
-# Back-end Development Year 1
+# Dyreadopsjon Database Prosjekt
 
-Adoption
+Dette prosjektet er et backend-system for en dyreadopsjon-applikasjon som fokuserer på databasehåndtering med MySQL. Systemet håndterer autentisering, brukerroller og databaseoperasjoner. Applikasjonen er designet for å kjøre lokalt og krever MySQL Workbench for å fungere optimalt.
 
-# Application Installation and Usage Instructions
+### Funksjoner
 
-1. Clone the repository
+- Autentiseringssystem med brukerroller (medlem og admin)
+- Database for dyr, brukere og adopsjonsinformasjon
+- CRUD-operasjoner for dyr, arter og temperament
+- Rollebasert tilgangskontroll
 
-```bash
-git clone https://github.com/mariusrundereim/backend-database-ca.git
-cd databaseproject
-```
+## Teknologier
 
-2. Install dependencies
+- **Express.js**
+- **MySQL**
+- **Sequelize** - ORM (Object-Relational Mapping)
+- **Passport.js**
+- **EJS**
+- **bcryptjs**
+- **Express-session**
 
-```bash
-npm install
-```
+## Systemkrav
 
-# Environment Variables
+- Node.js (v14 eller nyere)
+- MySQL Server (v8 eller nyere)
+- MySQL Workbench
 
-Create a `.env` file in the root directory using the following template:
+## Installasjon
 
-```env
-PORT=8080
-DB_HOST=localhost
-DB_USER=dabcaowner
-DB_PASS=dabca1234
-DB_NAME=adoptiondb
-SESSION_SECRET=your_session_secret
-```
+Følg disse trinnene for å sette opp prosjektet lokalt:
 
-# Additional Libraries/Packages
+1. Klone repositoriet:
 
-```json
-{
-  "dependencies": {
-    "bcryptjs": "^3.0.1",
-    "connect-flash": "^0.1.1",
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "dotenv": "^16.3.1",
-    "ejs": "^3.1.10",
-    "express": "^4.18.2",
-    "express-mysql-session": "^3.0.3",
-    "express-session": "^1.18.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.12.0",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
-    "sequelize": "^6.37.5"
-  }
-}
-```
+   ```bash
+   git clone https://github.com/mariusrundereim/backend-database-ca.git
+   cd databaseproject
+   ```
 
-# NodeJS Version Used
+2. Installer avhengigheter:
 
-- Node.js (v22.11.0)
+   ```bash
+   npm install
+   ```
 
-# DATABASE
+3. Opprett en `.env` fil i prosjektets rotmappe med følgende variabler:
 
-1. Create the database and user:
+   ```
+   DB_HOST=localhost
+   DB_USER=dabcaowner
+   DB_PASSWORD=dabca1234
+   DB_NAME=animal_adoption
+   SESSION_SECRET=dinsessionhemmelighet
+   ```
+
+4. Opprett databasen og brukeren i MySQL Workbench:
+
+   ```sql
+   CREATE DATABASE animal_adoption;
+   ```
+
+5. Start applikasjonen:
+
+   ```bash
+   npm start
+   ```
+
+6. Åpne nettleseren og gå til `http://localhost:3000`
+
+## DATABASEACCESS
 
 ```sql
-CREATE DATABASE adoptiondb;
+-- Opprett en ny bruker med databaseeier-rettigheter
 CREATE USER 'dabcaowner'@'localhost' IDENTIFIED BY 'dabca1234';
-GRANT ALL PRIVILEGES ON adoptiondb.* TO 'dabcaowner'@'localhost';
+GRANT ALL PRIVILEGES ON animal_adoption.* TO 'dabcaowner'@'localhost';
 FLUSH PRIVILEGES;
 ```
+
+## Prosjektstruktur
+
+Prosjektet følger en standard Express.js mappestruktur:
+
+- `/bin` - Oppstartsskript
+- `/config` - Konfigurasjonsfiler for database og Passport
+- `/models` - Sequelize modeller
+- `/routes` - Express ruter
+- `/public` - Statiske filer (CSS, JavaScript, bilder)
+- `/views` - EJS maler
+- `/migrations` - Sequelize migrasjonsfiler
+- `/seeders` - Data for initiell populering av databasen
+
+## Funksjonalitet
+
+### Navigasjon
+
+Applikasjonen har fem hovedsider tilgjengelig via navigasjonsmenyen:
+
+- **Hjem** - Landingsside
+- **Dyr** - Viser alle dyr i databasen
+- **Arter** - Administrasjon av dyrearter (kun for admin)
+- **Temperament** - Administrasjon av temperament (kun for admin)
+- **Logg inn** - For innlogging og registrering
+
+### Brukerroller
+
+- **Gjest** - Kan se dyr, men ikke adoptere
+- **Medlem** - Kan se og adoptere tilgjengelige dyr
+- **Admin** - Full tilgang, inkludert avbrytelse av adopsjoner, redigering av arter og temperament
+
+### Databaser
+
+Prosjektet bruker Sequelize ORM for å interagere med MySQL-databasen. Tabellstrukturen følger tredje normalform (3NF) og inkluderer relasjoner mellom dyr, arter, temperament, brukere og adopsjoner.
+
+## API-endepunkter
+
+### Dyr (animals.js)
+
+- `GET /animals` - Hent alle dyr
+- `POST /animals/adopt/:id` - Adopter et dyr (krever medlem-rolle)
+- `POST /animals/cancel/:id` - Avbryt adopsjon (krever admin-rolle)
+
+### Arter (species.js)
+
+- `GET /species` - Hent alle arter
+- `POST /species/add` - Legg til ny art (krever admin-rolle)
+- `POST /species/update/:id` - Oppdater art (krever admin-rolle)
+
+### Autentisering
+
+- `GET /login` - Vis innloggingsside
+- `POST /login` - Logg inn
+- `GET /signup` - Vis registreringsside
+- `POST /signup` - Registrer ny bruker
+- `GET /logout` - Logg ut
+
+## Bidrag
+
+For å bidra til prosjektet, vennligst følg disse trinnene:
+
+1. Fork repositoriet
+2. Opprett en ny branch (`git checkout -b feature/din-funksjon`)
+3. Commit endringene dine (`git commit -m 'Legg til funksjon'`)
+4. Push til branch (`git push origin feature/din-funksjon`)
+5. Åpne en Pull Request
